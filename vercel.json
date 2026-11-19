@@ -5,6 +5,20 @@
   "buildCommand": "npm run build:web",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/((?!assets/|api/|models/|.*\\.).*)", "destination": "/index.html" }
+    {
+      "source": "/((?!assets/|api/|models/|.*\\.).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin"
+        }
+      ]
+    }
   ]
 }
