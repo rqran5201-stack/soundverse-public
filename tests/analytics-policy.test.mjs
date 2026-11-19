@@ -1,0 +1,7 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import {anonymousPageView,canRecordVisits} from '../src/analyticsPolicy.ts'
+test('only the production HTTPS host is eligible',()=>{assert.equal(canRecordVisits('https:','soundverse-ivory.vercel.app',null,false),true);for(const [p,h]of [['file:',''],['http:','localhost'],['https:','preview.vercel.app']])assert.equal(canRecordVisits(p,h,null,false),false)})
+test('DNT and GPC suppress collection',()=>{assert.equal(canRecordVisits('https:','soundverse-ivory.vercel.app','1',false),false);assert.equal(canRecordVisits('https:','soundverse-ivory.vercel.app',null,true),false)})
+test('private paths, queries, hashes and extra fields never survive',()=>{for(let i=0;i<30;i++){const event={type:'pageview',url:'https://soundverse-ivory.vercel.app/private/work-'+i+'?token=TEST_SECRET_'+i+'#story=PRIVATE_SENTINEL',song:'PRIVATE_TRACK',fingerprint:'PRIVATE_HASH',lyrics:'PRIVATE_LYRICS'};assert.deepEqual(anonymousPageView(event),{type:'pageview',url:'https://soundverse-ivory.vercel.app/'});assert.equal(JSON.stringify(anonymousPageView(event)).includes('PRIVATE'),false)}})
+test('custom events, invalid URLs and unrelated origins are discarded',()=>{assert.equal(anonymousPageView({type:'event',url:'https://soundverse-ivory.vercel.app/'}),null);for(const url of ['invalid','https://example.com/private','file:///song.wav','http://soundverse-ivory.vercel.app/'])assert.equal(anonymousPageView({type:'pageview',url}),null)})
