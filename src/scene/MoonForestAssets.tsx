@@ -1,3 +1,4 @@
+import { publicWeb } from '../publicWeb'
 import shrubUrl from '../assets/models/moon-shrubs.glb'
 import archUrl from '../assets/models/sea-arch.glb'
 import grassUrl from '../assets/models/field-wind-grass.glb'
@@ -38,15 +39,15 @@ const fieldFerns: Placement[] = [[-7.4,-8,.58],[-10.5,-12,.52]]
 export default function MoonForestAssets({ world = 'moon', low, treeFallback, plantFallback }: {
   world?: Exclude<WorldId, 'sea'>; low: boolean; treeFallback?: ReactNode; plantFallback?: ReactNode
 }) {
-  const tree = useCuratedAsset(treeUrl, 'Moon forest tall tree', 20 * 1024 * 1024).asset
+  const tree = useCuratedAsset(publicWeb && world==='moon' ? '' : treeUrl, 'Moon forest tall tree', 20 * 1024 * 1024).asset
   const flower = useCuratedAsset(flowerUrl, 'Moon forest flowers').asset
   const rock = useCuratedAsset(rockUrl, 'Moon forest moss rock').asset
   const fern = useCuratedAsset(fernUrl, 'Moon forest ferns').asset
   return <>
     {tree ? <Placements world={world} asset={tree} points={world === 'field' ? fieldTrees : low ? lowTrees : trees} name={`user-${world}-trees`}/> : treeFallback}
     {world === 'moon' && flower && <Placements world={world} asset={flower} points={flowers} name={`user-${world}-flowers`}/>}
-    {rock && <Placements world={world} asset={rock} points={world === 'field' ? fieldRocks : rocks} name={`user-${world}-rocks`} sink={.24}/>}
-    {fern ? <Placements world={world} asset={fern} points={world === 'field' ? fieldFerns : ferns} name={`user-${world}-ferns`}/> : plantFallback}
+    {rock && <Placements world={world} asset={rock} points={publicWeb ? (world === 'field' ? fieldRocks : rocks).slice(0,3) : world === 'field' ? fieldRocks : rocks} name={`user-${world}-rocks`} sink={.24}/>}
+    {fern ? <Placements world={world} asset={fern} points={publicWeb ? (world === 'field' ? fieldFerns : ferns).slice(0,1) : world === 'field' ? fieldFerns : ferns} name={`user-${world}-ferns`}/> : plantFallback}
   </>
 }
 
@@ -55,8 +56,8 @@ export function CoastalAssets() {
   const rock = useCuratedAsset(rockUrl, 'Coastal moss rock').asset
   const fern = useCuratedAsset(fernUrl, 'Coastal ferns').asset
   return <>
-    {rock && <Placements world="sea" asset={rock} points={coastalRocks} name="user-sea-rocks" sink={.25}/>}
-    {fern && <Placements world="sea" asset={fern} points={coastalFerns} name="user-sea-ferns"/>}
+    {rock && <Placements world="sea" asset={rock} points={publicWeb ? coastalRocks.slice(0,3) : coastalRocks} name="user-sea-rocks" sink={.25}/>}
+    {fern && <Placements world="sea" asset={fern} points={publicWeb ? coastalFerns.slice(0,1) : coastalFerns} name="user-sea-ferns"/>}
   </>
 }
 

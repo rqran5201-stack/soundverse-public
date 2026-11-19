@@ -4,6 +4,7 @@ import { analyzeSong, type SongFeatureTimeline } from '../audio/songFeatures'
 import { useAudio } from '../useAudio'
 import { makeMoonDemo, makeMoonPulseDemo } from '../worlds/moonDemo'
 import { publicWeb } from '../publicWeb'
+import { AUDIO_IMPORT_GUIDE, audioFileProblem } from '../audio/importPolicy'
 import { narrativeState, type MoonNarrativeState } from '../worlds/moonNarrative'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -99,13 +100,16 @@ function V2Assets({placements, showMemory, overrides, onMissing}:{placements:Com
   const {asset:rock,status:rockStatus}=useCuratedAsset(rockUrl,'Moon forest moss rock')
   const {asset:fern,status:fernStatus}=useCuratedAsset(fernUrl,'Moon forest ferns')
   useEffect(()=>onMissing([treeStatus,rockStatus,fernStatus].includes('fallback')),[fernStatus,onMissing,rockStatus,treeStatus])
-  const trees=useMemo(()=>tree && moonV2Trees.map(()=>tree.scene.clone()),[tree])
-  const stones=useMemo(()=>rock && rocks.map(()=>rock.scene.clone()),[rock])
+  const assetTrees=publicWeb?moonV2Trees.filter((_,i)=>[0,2,5].includes(i)):moonV2Trees
+  const assetRocks=publicWeb?rocks.slice(0,2):rocks
+  const assetFerns=publicWeb?ferns.slice(0,2):ferns
+  const trees=useMemo(()=>tree && assetTrees.map(()=>tree.scene.clone()),[tree])
+  const stones=useMemo(()=>rock && assetRocks.map(()=>rock.scene.clone()),[rock])
   const memoryStones=useMemo(()=>rock && placements.map(()=>rock.scene.clone()),[rock,placements])
-  const leaves=useMemo(()=>fern && ferns.map(()=>fern.scene.clone()),[fern])
+  const leaves=useMemo(()=>fern && assetFerns.map(()=>fern.scene.clone()),[fern])
   return <group dispose={null}>
-    {tree && trees && moonV2Trees.map(([x,z,h],i)=><group key={i} position={[x,moonV2Height(x,z)-.12,z]} scale={tree.scale*h/2.4} rotation={[0,i*2.36,0]}><group position={tree.offset}><primitive object={trees[i]} /></group></group>)}
-    {rock && stones && rocks.map(([x,z,s],i)=><group key={i} position={[x,moonV2Height(x,z)-.16-s*.27,z]} scale={[rock.scale*s,rock.scale*s*.82,rock.scale*s]} rotation={[0,i*1.6,0]}><group position={rock.offset}><primitive object={stones[i]} /></group></group>)}
+    {tree && trees && assetTrees.map(([x,z,h],i)=><group key={i} position={[x,moonV2Height(x,z)-.12,z]} scale={tree.scale*h/2.4} rotation={[0,i*2.36,0]}><group position={tree.offset}><primitive object={trees[i]} /></group></group>)}
+    {rock && stones && assetRocks.map(([x,z,s],i)=><group key={i} position={[x,moonV2Height(x,z)-.16-s*.27,z]} scale={[rock.scale*s,rock.scale*s*.82,rock.scale*s]} rotation={[0,i*1.6,0]}><group position={rock.offset}><primitive object={stones[i]} /></group></group>)}
     {showMemory && rock && memoryStones && placements.map(({id,x,z,size},i)=>{
       const edit=overrides[id], factor=edit?.scale??1
       return <group key={id} name={id} position={[x,moonV2Height(x,z)-(.14+size*.18)*factor,z]}
@@ -114,7 +118,7 @@ function V2Assets({placements, showMemory, overrides, onMissing}:{placements:Com
         <group position={rock.offset}><primitive object={memoryStones[i]} /></group>
       </group>
     })}
-    {fern && leaves && ferns.map(([x,z,s],i)=><group key={i} position={[x,moonV2Height(x,z)-.07,z]} scale={fern.scale*s} rotation={[0,i*2.3,0]}><group position={fern.offset}><primitive object={leaves[i]} /></group></group>)}
+    {fern && leaves && assetFerns.map(([x,z,s],i)=><group key={i} position={[x,moonV2Height(x,z)-.07,z]} scale={fern.scale*s} rotation={[0,i*2.3,0]}><group position={fern.offset}><primitive object={leaves[i]} /></group></group>)}
   </group>
 }
 
@@ -374,6 +378,7 @@ export default function MoonV2Lab({onClose, confirmed, initialDemo=false}:{onClo
   },[currentTime,playing])
 
   async function prepare(file:File,demo=false){
+    const issue=audioFileProblem(file);if(issue){setStatus(issue);return}
     request.current?.abort()
     const controller=new AbortController()
     request.current=controller
@@ -399,7 +404,7 @@ export default function MoonV2Lab({onClose, confirmed, initialDemo=false}:{onClo
         setStatus('已加载离线演示 · 48 秒')
       }else setStatus('分析完成，确认蓝图后播放。')
     }catch{
-      if(!controller.signal.aborted)setStatus('无法分析这首歌。请选择五分钟以内的本地音频。')
+      if(!controller.signal.aborted)setStatus('无法分析：音频可能已损坏、编码不受支持，或时长超过 5 分钟。请使用有效的 PCM WAV 或 MP3。')
     }finally{
       if(!controller.signal.aborted)setBusy(false)
     }
@@ -490,10 +495,10 @@ export default function MoonV2Lab({onClose, confirmed, initialDemo=false}:{onClo
     setTime(currentTime()*1000)
   }
   return <main className="moon-v2-lab">
-    <p className="moon-quick-guide">先载入合成演示或选择本地歌曲 → 确认蓝图 → 点击播放。可切换「沿溪远望 / 林隙停留」对比空间，展开下方「想象与保存」继续创作。演示音由浏览器实时合成，不含第三方录音；本地歌曲不上传。</p>
+    <p className="moon-quick-guide">先载入合成演示或选择本地歌曲 → 确认蓝图 → 点击播放。点击「起点 / 路标 / 终点」沿路移动，用「入口 / 俯瞰」切换视角。可切换「沿溪远望 / 林隙停留」对比空间，展开下方「想象与保存」继续创作。演示音由浏览器实时合成，不含第三方录音；本地歌曲不上传。</p>
     <div className="moon-v2-controls">
       <button onClick={onClose}>返回画廊</button>
-      <h2>月光森林 V2</h2>
+      <h2>月光森林 V2</h2><small className="asset-credit">群核生成资产 · 乔木 / 苔石 / 蕨类</small>
       {(Object.keys(labels) as (keyof typeof labels)[]).map(key=><button key={key} data-view={key} aria-pressed={routeView===undefined&&key===view}
         disabled={locked&&((key==='creek'&&composition!=='creek')||(key==='clearing'&&composition!=='clearing'))}
         onClick={()=>{
@@ -517,6 +522,7 @@ export default function MoonV2Lab({onClose, confirmed, initialDemo=false}:{onClo
         const file=event.currentTarget.files?.[0];event.currentTarget.value=''
         if(file)void prepare(file)
       }} /></label>
+      <small className="audio-import-help">{AUDIO_IMPORT_GUIDE}</small>
       <button disabled={busy} onClick={()=>void prepare(makeMoonDemo(),true)}>载入离线演示</button>
       {!workId&&<button disabled={busy} onClick={()=>void makeMoonPulseDemo().then(file=>prepare(file,true))}>载入脉冲实验音乐</button>}
       {timeline&&!active&&<><label>根据想象选择场景 <select value={proposal} onChange={event=>setProposal(event.target.value as typeof proposal)}><option value="overlook">沿溪远望</option><option value="clearing">林间停留</option><option value="meeting">树下相遇</option></select></label><button onClick={()=>activate()}>确认本次蓝图</button></>}
@@ -560,7 +566,7 @@ export default function MoonV2Lab({onClose, confirmed, initialDemo=false}:{onClo
           })}
         </fieldset>
       </>}
-      {missingAssets&&<p role={publicWeb?undefined:'alert'}>{publicWeb?'公开演示采用程序化景物；未包含公开授权待确认的模型。':'部分场景资源缺失，仍可查看地形、路径和存档。'}</p>}
+      {missingAssets&&<p role={publicWeb?undefined:'alert'}>{publicWeb?'部分群核模型未能加载，已保留程序化环境；探索、音乐与保存仍可使用。':'部分场景资源缺失，仍可查看地形、路径和存档。'}</p>}
     </details>
     <div className="moon-v2-scene"><Canvas frameloop="demand" dpr={1} camera={{fov:46,near:.14,far:115}} shadows>
       <color attach="background" args={['#344650']} /><fog attach="fog" args={['#344650',visual?.nearFog??12,visual?.farFog??54]} />

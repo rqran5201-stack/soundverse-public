@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { audioFileProblem } from './audio/importPolicy'
 import { AudioEnvelope, measureAudio, silentSignals, type AudioSignals } from './audio/signals'
 
 type Session = {
@@ -76,8 +77,9 @@ export function useAudio() {
   }
 
   async function loadAudio(file: File, loop = true, autoplay = true) {
-    if (!file.type.startsWith('audio/')) {
-      setError('请选择音频文件。')
+    const problem = audioFileProblem(file)
+    if (problem) {
+      setError(problem)
       return
     }
     const request = ++intent.current
@@ -111,7 +113,7 @@ export function useAudio() {
         if (sessionRef.current !== session) return
         intent.current++
         setPlaying(false)
-        setError('无法读取此音频，请选择有效的音频文件。')
+        setError('此文件无法解码，可能已损坏或使用了浏览器不支持的编码。请改用 PCM WAV 或 MP3。')
       }
       setAudioName(file.name)
       if (autoplay) await play(session, request)

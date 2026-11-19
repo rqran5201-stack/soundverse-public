@@ -1,54 +1,39 @@
-# SOUNDVERSE
-## Every song opens a world.
+# SOUNDVERSE — Every song opens a world
 
-Live demo: https://soundverse-ivory.vercel.app
+**SOUNDVERSE — 让每首歌，都成为一个世界。**
 
-SOUNDVERSE explores how music and user imagination can shape an explorable, editable and revisitable 3D world. This public competition source snapshot includes the three base worlds and Moon Forest V2 through Song-to-World Step 6, plus the final submission-entry fixes.
+Demo: https://soundverse-ivory.vercel.app
 
-## Run locally
+导入音乐，写下你的想象，生成一座可以探索、编辑与保存的 3D 世界。Three real-time base worlds and Moon Forest V2 through Step 6: structured imagination, deterministic paths and memory places, A/B/C musical narrative, private local saves and fingerprint re-association.
 
-Use Node.js 22.19+ (Node 22 LTS or 24 LTS recommended).
+## Run
+
+Node.js 22.19+ (22 or 24 LTS recommended).
 
     npm ci
-    npm run dev
+    npm exec vite -- --config vite.public.config.ts
 
-Build the public production version:
+Production:
 
-    npm run build
+    npm run build:web
     npm run preview
 
-Vercel settings are included in vercel.json:
-- Framework: Vite
-- Root: ./
-- Install: npm ci
-- Build: npm run build:web
-- Output: dist
-- Environment variables: none required
+Vercel: root ./, Vite, npm ci, npm run build:web, output dist. No API keys required.
 
-## Try the product
+## First visit
 
-Click “立即体验” on the homepage to prepare a 48-second browser-generated synthetic demo, then click “播放”. No personal song is required.
+Use “立即体验” for a 48-second browser-generated synthetic demo (no third-party recording), then click play. “用我的音乐创作” opens local-song creation. Select structured space options to confirm what your imagination means; arbitrary natural-language story understanding is not claimed.
 
-Moon Forest V2 supports editable structured imagination fields, different routes and memory places, A/B/C narrative seeking, local private saves, and audio fingerprint re-association after revisiting. Story text does not claim arbitrary automatic semantic understanding.
+Recommended PCM WAV; MP3 also tested in desktop Edge. Files ≤40 MiB, full-song analysis ≤5 minutes. M4A/FLAC and other encodings are browser-dependent and not uniformly verified. Encrypted NCM is not directly supported. Local audio is not uploaded or stored in the work.
 
-## Local Audio First
+## Aholo / Lux3D assets
 
-Local audio is selected, played and analyzed in the browser. Works save structured world data and a private audio fingerprint, not the original audio, PCM, object URL or full imported lyrics. Missing music still allows a static visit. Browser storage is scoped to the website origin and is not a cross-device cloud backup.
+The creator explicitly confirmed on 2026-11-19 that these assets may be publicly displayed in the competition website. Six selected self-contained GLBs are now included: starlight tree, mushroom cluster, ancient tree, natural tall tree, moss rock and fern cluster. Textures were optimized; geometry and UVs are unchanged. Public instance counts are bounded. Other heavy assets remain on procedural fallback. See ASSET_AUDIT.md and ASSET_PROVENANCE.md for provenance, sizes, usage and limitations. Public display does not grant an open asset reuse license.
 
-The synthetic demos are generated from project code, with no third-party recordings or samples. Use only music you are authorized to use.
+The optional paid generation backend remains disabled in the public build. No credentials, personal music, private saves, original lyrics, signed URLs or private development history are distributed.
 
-## Public-release asset boundary
+## Persistence and boundaries
 
-Unconfirmed-public-license GLBs, captured artwork, personal music, private saves, server task journals, credentials and development history are excluded from this repository. The public Vite configuration resolves excluded model imports to procedural fallbacks and uses simple generated gallery artwork.
+Private works store versioned blueprints, compiled structure, seed, stable IDs, edits and a private audio fingerprint. Missing music still allows a static visit; the original local file must match before synchronized playback resumes. Storage is scoped to the site origin; cloud backup and public sharing are not implemented. moon-1 and moon-2 remain separate.
 
-Lux3D single-asset generation and imported models were validated in the private development prototype. The public Web release does not enable paid generation, expose server credentials or claim complete AI world generation. Relative GLB imports remain as integration points and are handled by vite.public.config.ts; the original binary assets are intentionally absent.
-
-This repository is a fresh public snapshot, not a mirror of the private repository's branches or history. It matches the public app source at private release 7e8badd, with public-only npm scripts made self-contained. Private tests and Windows packaging scripts are not included.
-
-## Stack and validation
-
-React 19, TypeScript, Vite, Three.js, React Three Fiber, Drei and Web Audio.
-Validation on the release: production build, 40 development-unit tests, clean Edge HTTPS flow through the three worlds, V2 creation, synthetic audio A/B/C seek, private save/refresh/relink, and edit preservation. Public deployment verification recorded no resource errors or audio upload requests.
-Public-only npm scripts expose development, build and preview; the private test suite is not redistributed here.
-
-No open-source license is granted by this snapshot unless the author adds a LICENSE. Public source visibility is provided for competition review; dependency licenses remain with their respective owners.
+React 19 / TypeScript / Vite / Three.js / React Three Fiber / Drei / Web Audio. The private development test suite is not redistributed in this source snapshot. No general open-source or asset reuse license is granted unless the author adds one; dependency licenses remain with their owners.
