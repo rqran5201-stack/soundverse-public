@@ -1,0 +1,39 @@
+{
+  "date": "2026-11-19",
+  "modelAuthorization": "Creator confirmed public competition display permission in project conversation",
+  "records": [
+    {
+      "id": "sea",
+      "file": "sea.jpg",
+      "width": 960,
+      "height": 600,
+      "bytes": 50369,
+      "sha256": "7ec16da0df81752fc3b9660acdf029386b04a8e0e5b57ce3b08eaaeb186921a4",
+      "source": "SOUNDVERSE production build 14edd48 runtime screenshot, default public base-world camera; captured locally with UI overlays hidden",
+      "containsPrivateObjects": false,
+      "originalConceptArt": false
+    },
+    {
+      "id": "moon",
+      "file": "moon.jpg",
+      "width": 960,
+      "height": 600,
+      "bytes": 62692,
+      "sha256": "5f56712b6c6a8d1a390d4d8bb989b0075ecc6265de38019e131f5419394f4b22",
+      "source": "SOUNDVERSE production build 14edd48 runtime screenshot, default public base-world camera; captured locally with UI overlays hidden",
+      "containsPrivateObjects": false,
+      "originalConceptArt": false
+    },
+    {
+      "id": "field",
+      "file": "field.jpg",
+      "width": 960,
+      "height": 600,
+      "bytes": 67159,
+      "sha256": "bef1056f96f070d266caafebb8b422ef5c803454a0ddf4a34c9f14b95919d23b",
+      "source": "SOUNDVERSE production build 14edd48 runtime screenshot, default public base-world camera; captured locally with UI overlays hidden",
+      "containsPrivateObjects": false,
+      "originalConceptArt": false
+    }
+  ]
+}
